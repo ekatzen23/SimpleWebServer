@@ -1,7 +1,5 @@
 require 'socket'
-# return index.html if using GET request
-# return size of the file
-# return status codes (200 = success, 404 = error)
+require 'json'
 
 server = TCPServer.new('', 2000) # '' means to bind to "all interfaces", same as nil or '0.0.0.0'
 loop {
@@ -13,10 +11,10 @@ loop {
     request_header, request_body = request.split("\r\n\r\n", 2)   # splits request into header and body
     path = request_header.split[1][1..-1]                         # gets path from request header
     method = request_header.split[0]                              # gets method: GET or POST
-
-    if File.exist?(path)
+    
+	if File.exist?(path)
       response_body = File.read(path)
-      client.puts "HTTP/1.1 200 OK\r\nContent-type:text/html\r\n\r\n"
+      client.puts "HTTP/1.1 200 OK\r\nContent-type:text/html \nSize: #{response_body.size} \r\n\r\n"
       if method == 'GET'
         client.puts response_body
       elsif method == 'POST'
